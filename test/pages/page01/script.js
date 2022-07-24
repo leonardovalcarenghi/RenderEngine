@@ -1,0 +1,3 @@
+InitializePage = function (page) {
+
+}

@@ -1,0 +1,13 @@
+ h1 {
+     color: darkblue;
+     font-family: 'Courier New', Courier, monospace;
+ }
+
+ p {
+     color: gray;
+ }
+
+ label {
+     font-size: 12px;
+     font-weight: bold;
+ }
