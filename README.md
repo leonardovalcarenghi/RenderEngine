@@ -1,6 +1,6 @@
 
 # Introdução
-**RouterEngine** é um motor de renderização de páginas e componentes utilizando VanillaJS.
+**RenderEngine** é um motor de renderização de páginas e componentes utilizando VanillaJS.
 
 
 > **Desenvolvedor**: Leonardo Valcarenghi

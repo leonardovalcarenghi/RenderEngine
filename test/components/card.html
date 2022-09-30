@@ -1,0 +1,55 @@
+<component name="component">
+
+    <view class="abc 123">
+    
+        <h1>{{name}}</h1>
+        <h2>{{lastName}}</h2>
+        <p>{{email || '<em>usuário sem e-mail...</em>'}}</p>
+        <button type="button" onclick="onClick">Aviso</button>      
+
+    </view>
+
+    <script>
+
+
+
+    </script>
+
+    <style>
+        component {
+            backgroundColor: {{email ? 'lightblue': 'darkred'}};
+            color: {{email ? 'black': 'white'}};
+            margin-bottom: 10px;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        component h1 {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        component h2 {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: 18px;
+            margin: 0;
+        }
+
+
+        component p {
+            margin: 0;
+        }
+
+        component button {
+            margin-top: 5px;
+            display: block;
+        }
+
+        component.warning {
+            background-color: red;
+            color: white;
+        }
+    </s>
+
+</component>
