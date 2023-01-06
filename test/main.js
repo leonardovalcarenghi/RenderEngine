@@ -2,6 +2,8 @@
 var Container;
 var Render = new RenderEngine();
 
+
+
 window.onload = async function () {
 
     Container = document.getElementById('MainContainer');
@@ -30,12 +32,14 @@ async function Routing() {
 
     if (hash == 'pagina-02') {
         // Renderizar Página:
-        Render.Page('/pages/page02');
+        await Render.Page('/pages/page02');
+        Page02();
     }
 
     if (hash == 'pagina-03') {
         // Renderizar Página:
         Render.Page('/pages/page03');
+        Page03();
     }
 }
 
@@ -53,7 +57,7 @@ async function Page01() {
     }
 
     const onKeyUp = (e, component, $scope) => {
-         component.querySelector('h1').innerHTML = e.target.value;
+        component.querySelector('h1').innerHTML = e.target.value;
     }
 
     const events = { onClick, onKeyUp }
@@ -87,6 +91,27 @@ async function Page01() {
     ];
 
     const elements = card.render(Container, list);
+    console.log("elements", elements)
+}
+
+async function Page02() {
+
+    const postComponent = await Render.ImportComponent("/components/post");
+    const imageComponent = await Render.ImportComponent("/components/image");
+    const posts = [{ fulaninho: 'Leonardo' }, { fulaninho: 'Rafael' }].map(x => { return { ...x, imageComponent } });
+    postComponent.render(Container, posts);
+
+
+}
+
+
+async function Page03() {
+    const component = await Render.ImportComponent("/components/component");
+    const data1 = { pessoa: "LEONARDO" };
+    const data2 = { pessoa: "AMANDA" };
+    const data3 = { pessoa: "JOÃO" };
+    const list = [data1, {}, data2, data3, {}, {}];
+    component.render(Container, list);
 
 }
 
@@ -94,7 +119,6 @@ async function Page01() {
 // var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
 //     return new bootstrap.Dropdown(dropdownToggleEl)
 // })
-
 
 
 

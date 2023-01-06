@@ -1,0 +1,55 @@
+<component name="hello-world">
+
+    <script>
+
+        $SCOPE.componentDidMount = function () {
+     
+            $VIEW.querySelector('[name="testButton"]').addEventListener("click", function () {
+                $VIEW.remove();
+            })
+
+
+        }
+
+        $SCOPE.componentWillUnmount = function () {
+
+            console.log("componentWillUnmount, ELEMENTO FOI REMOVIDO");
+
+        }
+
+
+
+
+        const list = [
+            { nome: 'Leonardo' },
+            { nome: 'Leonardo' },
+            { nome: 'Lucas' },
+            { nome: 'Fernando' }
+        ]
+
+
+
+    </script>
+
+    <view style="margin: 10px;">
+        <label>Bem-vindo(a)
+            {{
+            $IF(typeof(pessoa) === "string", $SCOPE["pessoa"], "nada")
+            }}
+        </label>
+
+        <button name="testButton">Remover</button>
+
+        <ul>
+            {{
+            $MAP(list, _=>{
+
+            return `<li>${_.nome}</li>`
+
+            })
+            }}
+        </ul>
+
+    </view>
+
+</component>

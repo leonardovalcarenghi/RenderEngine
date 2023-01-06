@@ -8,10 +8,6 @@
     // Base URL:
     var Base = '';
 
-    // Render Templating:
-    var RenderTemplating;
-    var RenderTemplatingMethod;
-
     var Settings = {
         files: {
             html: 'view',
@@ -67,14 +63,6 @@
         return this;
     };
 
-    // Atribuir um RenderTemplating como serviço de renderização de dados em um HTML:
-    RenderEngine.prototype.SetRenderTemplating = function (object, method = '') {
-        RenderTemplating = object || null;
-        RenderTemplatingMethod = method || null;
-        return this;
-    };
-
-
     RenderEngine.prototype.SetPageContainer = function (container) {
         PageContainer = container || null;
         return this;
@@ -127,7 +115,7 @@
             // const pageFunction = new Function('', js);
         }
         catch (error) {
-            console.log('erro ao buscar script');
+            // console.log('erro ao buscar script');
         }
 
         return this;
@@ -141,9 +129,7 @@
 
     }
 
-    // Importar Componente:
-    RenderEngine.prototype.ImportComponent = async function (path) {
-
+    RenderEngine.prototype.ImportComponentAsync = async function (path) {
         const component = await this.__getComponentAsElement(path);
         const name = component.getAttribute('name');
 
@@ -153,12 +139,12 @@
                 const elements = [];
                 if (Array.isArray(data)) {
                     data.forEach(DATA => {
-                        const elementRendered = this.__render(container, DATA, component);
+                        const elementRendered = _render(container, component, DATA);
                         elements.push({ data: DATA, element: elementRendered });
                     });
 
                 } else {
-                    const elementRendered = this.__render(container, data, component);
+                    const elementRendered = _render(container, component, data);
                     elements[0] = { data, element: elementRendered };
                 }
                 return elements;
@@ -168,6 +154,37 @@
 
         return { ...obj };
     }
+
+    // Importar Componente:
+    RenderEngine.prototype.ImportComponent = function (path) {
+
+        const component = _getComponentAsElement(path);
+        const name = component.getAttribute('name');
+
+        const obj = {
+            name,
+            render: (container, data) => {
+                const elements = [];
+                if (Array.isArray(data)) {
+                    data.forEach(DATA => {
+                        const elementRendered = _render(container, component, DATA);
+                        elements.push({ data: DATA, element: elementRendered });
+                    });
+
+                } else {
+                    const elementRendered = _render(container, component, data);
+                    elements[0] = { data, element: elementRendered };
+                }
+                return elements;
+            }
+            // renderBefore: (container, data) => {return this.renderBefore(component, container, data); },            
+        };
+
+        return { ...obj };
+
+    }
+
+
 
 
     RenderEngine.prototype.__getComponentAsElement = async function (path) {
@@ -180,48 +197,305 @@
     }
 
 
-    RenderEngine.prototype.__render = function (container, data, component) {
+    const _getComponentAsElement = function (path) {
+        const request = new XMLHttpRequest();
+        request.open('GET', `${Base}/${path}.html`, false);
+        request.send(null);
+        if (request.status === 200) {
+            const element = document.createElement('div');
+            element.innerHTML = request.responseText;
 
-
-        // Informações //
-        const identifier = this.__newIdentifier();
-        const name = component.getAttribute('name');
-
-        // Visualização //
-        const view = component.querySelector('view');
-        const viewAttributes = [].slice.call(view.attributes);
-        const viewCompiled = this.__compileView(identifier, view, data);
-        viewCompiled.setAttribute('component-name', name);
-        viewAttributes.forEach(attr => { viewCompiled.setAttribute(attr.name, attr.value); });
-
-
-
-        // viewCompiled.setAttribute('class', attrClass);
-
-        // Estilo //
-        const style = component.querySelector('style');
-        if (style) {
-            const styleCompiled = this.__compileStyle(identifier, style, data);
-            viewCompiled.appendChild(styleCompiled);
+            const htmlElement = element.querySelector('component')
+            return htmlElement;
         }
-
-        container.appendChild(viewCompiled);
-        return viewCompiled;
-
     }
+
+    const _render = function (container = document.querySelector(""), component = document.querySelector(""), data = {}) {
+
+        const identifier = _newIdentifier();
+        const name = component.getAttribute("name") || `component-${identifier}`;
+
+        // Bases:
+        const view = component.querySelector("view");
+        const script = component.querySelector("script");
+        const style = component.querySelector("style");
+
+        const compiledView = _compileView(identifier, data, view, script);
+        const compiledStyle = style ? _compileStyle(identifier, data, style) : null;
+        if (compiledStyle) { compiledView.appendChild(compiledStyle); }
+
+        // Atributos:
+        const componentAttributes = [].slice.call(view.attributes);
+        componentAttributes.forEach(attr => { compiledView.setAttribute(attr.name, attr.value); });
+
+        container.appendChild(compiledView);
+        return compiledView;
+    }
+
+
+    // RenderEngine.prototype.__render = function (container, data, component) {
+
+
+    //     // Informações //
+    //     const identifier = this.__newIdentifier();
+    //     const name = component.getAttribute('name');
+
+    //     // Visualização //
+    //     const script = component.querySelector('script');
+    //     const view = component.querySelector('view');
+    //     const viewAttributes = [].slice.call(view.attributes);
+    //     const viewCompiled = this.__compileView(identifier, view, script, data);
+    //     viewCompiled.setAttribute('component-name', name);
+    //     viewAttributes.forEach(attr => { viewCompiled.setAttribute(attr.name, attr.value); });
+
+
+
+    //     // viewCompiled.setAttribute('class', attrClass);
+
+    //     // Estilo //
+    //     const style = component.querySelector('style');
+    //     if (style) {
+    //         const styleCompiled = this.__compileStyle(identifier, style, data);
+    //         viewCompiled.appendChild(styleCompiled);
+    //     }
+
+    //     container.appendChild(viewCompiled);
+    //     return viewCompiled;
+
+    // }
 
     // RenderEngine.prototype.__renderBefore = function (component, container, data) {
 
     // }
 
 
+    const _compileView = function (identifier, data, view, script) {
+
+        const nameOfElements = _getElementsInView(view);
+        const $scope = _getScopeData(data, nameOfElements);
+        const [keys, values] = _getDataUnstructured(data);
+
+        const functionContent = _mountComponentFunctionScope(identifier, view, script); // Montar conteúdo da função.
+        const scopeFunction = new Function(['$SCOPE', ...keys, ...nameOfElements], functionContent); // Criar função via JS
+        const [component, _this] = scopeFunction($scope, ...values); // Executar função e retornar componente compilado.
+        _addEventListenersInComponent(component, $scope); // declarar eventos nos elementos.     
+        _callEventsInComponent(component, $scope); // chamar função interna dizendo q o componente foi montado.        
+        return component;
+
+    }
+
+    const _compileStyle = function (identifier, data, style) {
+
+        const $scope = _getScopeData(data);
+        const [keys, values] = _getDataUnstructured(data);
+        const functionContent = _mountStyleFunctionScope(identifier, style)
+        const scopeFunction = new Function(['$SCOPE', ...keys], functionContent);
+        const element = scopeFunction($scope, ...values);
+        return element;
+
+    }
+
+    const _getDataUnstructured = function (data) {
+        const keys = Object.keys(data);
+        const values = Object.values(data);
+        return [keys, values];
+    }
+
+    const _getScopeData = function (data, nameOfElements = []) {
+        return {
+            ...data,
+            elements: nameOfElements,
+            $set: (key, value) => {
+                $scope[key] = value;
+                return "";
+            }
+        }
+    }
+
+    const _getElementsInView = function (view) {
+
+        const names = [];
+        [...view.querySelectorAll("[name]")].forEach(element => {
+            const name = element.getAttribute("name");
+            names.push(name);
+        });
+        return names;
+
+    }
+
+    const _mountComponentFunctionScope = function (identifier, view, script = null) {
+
+        view = view.innerHTML.toString()
+            .replaceAll('&lt;', '<')
+            .replaceAll('&gt;', '>')
+            .replaceAll('{{', '${ ')
+            .replaceAll('}}', ' }')
+
+        script = script?.innerHTML.toString();
+
+
+        let internalFunctions = (function () {
+
+            const internalInitialize = function (component) {
+
+            }
+
+            const $CONSOLE = function () {
+                console.log(...arguments);
+                return '';
+            }
+
+            const $IF = function (condition, caseTrue, caseFalse) {
+                if (condition == true) { return caseTrue } else { return caseFalse; }
+            }
+
+            const $RENDER = function (path, data = {}) {
+                const component = Render.ImportComponent(path);
+                const result = component.render(document.createElement("div"), data);
+                return result[0].element.innerHTML;
+            }
+
+            const $MAP = function (array = [], linq) {
+                return array.map(linq);
+            }
+
+            const instanceElementsInView = function () {
+
+                $SCOPE.elements.forEach((name) => {
+
+                    const element = $VIEW.querySelectorAll(`[name="${name}"]`)
+
+
+                    eval(`var ${name} = 123;`)
+                    // window["abc123"] = element
+
+                    if (typeof (name) === 'undefined') {
+
+                    }
 
 
 
-    RenderEngine.prototype.__compileView = function (identifier, view, data) {
+                })
+
+                // [...$VIEW.querySelectorAll("[name]")].forEach(element => {
+                //     const name = element.getAttribute("name");
+                //     _this[name] = element;
+                // });
+            }
+
+
+        }).toString();
+        internalFunctions = internalFunctions.slice(internalFunctions.indexOf("{") + 1, internalFunctions.lastIndexOf("}"));
+
+
+
+        return `
+
+          
+            // const _args = Array.slice(arguments);
+            // console.log("_args", _args)
+            const _this = this;
+            const $VIEW = document.createElement("div");
+            $VIEW.setAttribute('component-identifier', "${identifier}");
+
+            ${script}
+
+            ${internalFunctions}          
+
+            $VIEW.innerHTML = \`${view}\`;   
+            instanceElementsInView();
+            return [$VIEW, this];        
+        `;
+
+    }
+
+    const _mountStyleFunctionScope = function (identifier, style) {
+
+        style = style.innerHTML.toString()
+            .replaceAll('component', `[component-identifier="${identifier}"]`)
+            .replaceAll('{{', '${')
+            .replaceAll('}}', '}');
+
+        return `
+            const $style = document.createElement("style");
+            $style.setAttribute('type', 'text/css');
+            $style.setAttribute('style-component-identifier', "${identifier}");
+ 
+            $style.innerHTML = \`${style}\`;
+            return $style;        
+        `;
+    }
+
+    const _callEventsInComponent = function (component, $scope) {
+
+        if (typeof ($scope.componentDidMount) === "function") { $scope.componentDidMount(component); }
+
+
+        const in_dom = document.body.contains(component);
+        const observer = new MutationObserver(function (mutations) {
+
+            if (document.body.contains(element)) {
+                if (!in_dom) {
+                    console.log("element inserted");
+                }
+                in_dom = true;
+            } else if (in_dom) {
+                in_dom = false;
+                console.log("element removed");
+            }
+
+
+        });
+
+        observer.observe(document.body, { childList: true });
+
+
+
+
+    }
+
+    const _addEventListenersInComponent = function (component, $scope) {
+        const mouseEvents = ['onclick', 'onmouseover', 'onmouseout', 'onmousedown', 'onmouseup', 'onmousemove'];
+        const keyboardEvents = ['onkeydown', 'onkeyup', 'onkeypress'];
+        const formEvents = ['onfocus', 'onsubmit', 'onblur', 'onchange'];
+        const events = [...mouseEvents, ...keyboardEvents, ...formEvents];
+
+        events.forEach(event_name => {
+            component.querySelectorAll(`[${event_name}]`).forEach(element => {
+                const eventRef = element.getAttribute(event_name);
+                const eventType = event_name.substring(2);
+                const eventFunction = $scope[eventRef];
+                const isFunction = (typeof eventFunction === 'function');
+                element.removeAttribute(event_name);
+                if (isFunction) {
+                    element.addEventListener(eventType, (event) => { return eventFunction(event, component, $scope); });
+                }
+            });
+        });
+    }
+
+
+    const _observerElementInDOM = new MutationObserver(function (mutations_list) {
+        mutations_list.forEach(function (mutation) {
+            mutation.removedNodes.forEach(function (removed_node) {
+                if (removed_node.id == 'child') {
+                    console.log('#child has been removed');
+                    observer.disconnect();
+                }
+            });
+        });
+    });
+
+
+
+
+
+    RenderEngine.prototype.__compileView = function (identifier, view, script, data) {
 
         const element = document.createElement('div');
         element.setAttribute('component-identifier', identifier);
+
+
 
 
         const viewContent = view.innerHTML.toString()
@@ -230,26 +504,58 @@
             .replaceAll('}}', ' }')
 
 
+        const scriptCode = script?.innerHTML.toString();
+
         // Scope //
+
         const keys = Object.keys(data);
+        keys.forEach(KEY => {
+            const ref = data[KEY];
+            if (typeof (ref) === 'string') {
+                // const span = document.createElement('span');
+                // span.innerHTML = ref;
+                // data[KEY] = span.outerHTML;
+                // data[`ELEMENT_${KEY}`] = span;
+            }
+        });
+
         const values = Object.values(data);
+
+        // const keys = _getKeysOfScope(data);
+        // const values = _getValuesOfKeysOfScope(data);
         const $scope = {
             ...data,
-            $setScope: (key, value) => {
+            $set: (key, value) => {
+
+                // const element = data[`ELEMENT_${key}`]
+                // if (element) { element.innerHTML = value; }
+
                 $scope[key] = value;
+                return "";
+
             }
         }
 
-        // Compilador //
-        const _functionBody = this.__compileFunctionContent(identifier, viewContent);
-        const _function = new Function(['$scope', ...keys], _functionBody);
-        const _functionResult = _function($scope, ...values);
+        // Elementos:
+        // const _viewElements = view.querySelectorAll("[name]");
+        // console.log("_viewElements",_viewElements);
+        // console.log("---------------------------------------------")
 
-        element.innerHTML = _functionResult;
+
+
+
+        // Compilador //
+        const _functionBody = this.__compileFunctionContent(identifier, viewContent, scriptCode);
+        const _function = new Function(['$scope', ...keys], _functionBody);
+        element.innerHTML = _function($scope, ...values);
+
+
+
         this.__initializeEventsInComponent(element, $scope);
         return element;
 
     }
+
 
     RenderEngine.prototype.__compileStyle = function (identifier, style, data) {
 
@@ -281,47 +587,49 @@
 
     }
 
+
+
     RenderEngine.prototype.__initializeEventsInComponent = function (component, $scope) {
 
-        const keys = Object.keys($scope);
-        keys.forEach(K => { if (K['0'] == '$') { delete $scope[K] } })
 
+
+        if (typeof ($scope.___componentDidMount) === "function") {
+
+            $scope.___componentDidMount(component);
+
+        }
+
+        const keys = Object.keys($scope);
         const mouseEvents = ['onclick', 'onmouseover', 'onmouseout', 'onmousedown', 'onmouseup', 'onmousemove'];
         const keyboardEvents = ['onkeydown', 'onkeyup', 'onkeypress'];
         const formEvents = ['onfocus', 'onsubmit', 'onblur', 'onchange'];
         const events = [...mouseEvents, ...keyboardEvents, ...formEvents];
 
-
         events.forEach(event_name => {
-
             component.querySelectorAll(`[${event_name}]`).forEach(element => {
-
-                const attrEvent = element.getAttribute(event_name);
-                const eventListener = event_name.substring(2);
-                const _function = $scope[attrEvent] || eval(attrEvent);
-                const isFunction = (typeof _function === 'function');
-                if (attrEvent && isFunction) {
-                    element.removeAttribute(event_name);
-                    element.addEventListener(eventListener, (e) => { return _function(e, component, $scope); });
+                const eventRef = element.getAttribute(event_name);
+                const eventType = event_name.substring(2);
+                const eventFunction = $scope[eventRef];
+                const isFunction = (typeof eventFunction === 'function');
+                element.removeAttribute(event_name);
+                if (isFunction) {
+                    element.addEventListener(eventType, (event) => { return eventFunction(event, component, $scope); });
                 }
-
             });
-
-        });      
+        });
 
     }
 
-    RenderEngine.prototype.__compileFunctionContent = function (identifier, content) {
+    RenderEngine.prototype.__compileFunctionContent = function (identifier, content, script) {
 
-        return ` 
-
+        return `
+            ${script}
             const $___console = function () {
                 console.log(...arguments);
                 return '';
-            }          
-        
-            return \`${content}\`;     
-        
+            }
+
+            return \`${content}\`;        
         `;
 
     }
@@ -333,6 +641,12 @@
         }).replaceAll('-', '');
     }
 
+    const _newIdentifier = function () {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        }).replaceAll('-', '');
+    }
 
     RenderEngine.prototype.ImportComponent__ = function (path) {
         if (!RenderTemplating) { throw 'Para renderizar um componente é necessário instânciar um Render Templating.' }
@@ -412,3 +726,4 @@
     return RenderEngine;
 
 })));
+

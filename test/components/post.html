@@ -1,0 +1,606 @@
+<component name="worker-feed-post">
+
+    <script>
+
+        $scope.$componentDidMount = function () {
+            console.log("Componente Montou!");
+            // renderImages();
+            renderComments();
+        }
+
+        function renderImages() {
+            const imagesContainer = $component.querySelector(".feed-post-images-container");
+            imageComponent.render(imagesContainer, images);
+        }
+
+        function renderComments() {
+
+        }
+
+        var title;
+        var subTitle;
+        var description;
+        var body;
+        var insertedDate;
+        var creator = { name: fulaninho, picture: "https://api.lorem.space/image/face?w=150&h=150" };
+        var images = [{ url: "https://api.lorem.space/image/watch?w=500&h=500" }, { url: "https://api.lorem.space/image/watch?w=500&h=500" }, { url: "https://api.lorem.space/image/watch?w=500&h=500" }];
+        var likes = 0;
+        var comments = 0;
+        var views = 0;
+        var likedByUser = false;
+
+
+
+
+        function abc() {
+            return "LEONARDO"
+        }
+
+
+
+
+
+
+        $scope.likePost = function (e, component) {
+            console.log('curtir');
+            // console.log('curtir', likeButton);
+            $element.likeButton.classList.add("is-liked");
+            // likeButton.classList.add("is-liked");
+        }
+
+        $scope.refreshCount = function () {
+
+        }
+
+        $scope.newComment = function () {
+
+        }
+
+
+    </script>
+
+    <view attr-test="leonardo">
+
+        <div class="post-area post-header">
+            {{ abc() }}
+        </div>
+
+        <div class="post-area post-content">
+
+        </div>
+
+        <div class="post-area post-footer">
+
+            <div class="post-statistics">
+                <label>{{ likes }} curtidas</label>
+                <span>•</span>
+                <label>{{ comments }} comentários</label>
+                <span>•</span>
+                <label>{{ views }} visualizações</label>
+            </div>
+
+            <hr />
+
+            <div class="post-actions-buttons">
+                <button class="btn-post-action" type="button" name="likeButton" onclick="likePost">
+                    <i class="bi bi-hand-thumbs-up"></i>
+                    <span>Curtir</span>
+                </button>
+                <button class="btn-post-action" type="button" name="commentButton">
+                    <i class="bi bi-chat"></i>
+                    <span>Comentar</span>
+                </button>
+                <button class="btn-post-action" type="button" name="viewButton">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    <span>Visualizar</span>
+                </button>
+            </div>
+
+            <div class="post-comment-input">
+                <input type="text" placeholder="Adicionar comentário" />
+            </div>
+
+            <div class="post-comments">
+
+            </div>
+
+        </div>
+
+
+    </view>
+
+    <div>
+        <div class="feed-post-creator-container">
+            <a href="#profile?id=${creator.id}">
+                <div class="feed-post-creator-image">
+                    <img class="creator-image" src="{{creator.picture}}" alt="Autor" title="${creator.name}" />
+                </div>
+            </a>
+            <div class="feed-post-creator-meta">
+
+                <a href="#profile?id=${creator.id}">
+                    <span class="creator-name">${creator.name}</span>
+                    <small class="creator-nickname">
+                        ${ creator.nickName ? '(' : '' }
+                        ${ creator.nickName || '' }
+                        ${ creator.nickName ? ')' : '' }
+                    </small>
+                </a>
+
+                <span>
+                    <span class="creator-sector">${creator.sector || 'setor do usuário'}</span>
+                    •
+                    <span class="creator-job">${creator.job || 'cargo do usuário'}</span>
+                </span>
+                <span class="post-date">${insertedDate}</span>
+            </div>
+
+            <div class="feed-post-options">
+                <button class="btn btn-icon" type="button">
+                    <i class="far fa-ellipsis-v"></i>
+                </button>
+            </div>
+
+        </div>
+
+        <div class="feed-post-description-container show-more">
+            <span class="post-title">${title}</span>
+            <span class="post-subtitle ">${subTitle}</span>
+            <!-- <p class="post-description">${description}</p> -->
+            <div class="post-body">[BODY]</div>
+            <a class="show-more-description-button" href="javascript:;">ver mais</a>
+        </div>
+
+        <div class="feed-post-images-container ${images ? (images.length == 1 ? 'one-image' : images.length == 2 ? 'two-images' : images.length == 3 ? 'three-images' : images.length == 4 ? 'four-images' : 'fivemore-images') : ''}"
+            style="display: ${images ? (images.length == 0 ? 'none': 'grid') : ''}">
+        </div>
+
+        <div class="feed-post-social-counts">
+            <div>
+                <a href="javascript:;" style="display: ${likes == 0 ? 'none' : 'inline-block'}">
+                    <i class="icon icon bi bi-hand-thumbs-up mr-1"></i>
+                    <span> ${likes} ${likes == 1 ? 'curtida' : 'curtidas'} </span>
+                </a>
+            </div>
+
+            <div>
+
+                <a href="javascript:;" style="display: ${comments == 0 ? 'none' : 'inline-block'}">
+                    ${comments} ${comments == 1 ? 'comentário' : 'comentários'}
+                </a>
+                <span style="display: ${comments == 0 ? 'none' : 'inline-block'}; margin: 0 5px;">
+                    •
+                </span>
+
+                <a href="javascript:;" style="display: ${views == 0 ? 'none' : 'inline-block'}">
+                    ${views} ${views == 1 ? 'visualização' : 'visualizações'}
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="feed-post-actions-container">
+            <button type="button" class="post-action-button like-button ${ likedByUser ? 'is-liked' : '' }"
+                onclick="likePost" name="likeButton">
+                <i class="fal fa-thumbs-up mr-2"></i>
+                Curtir
+            </button>
+            <button type="button" class="post-action-button comment-button" onclick="newComment">
+                <i class="icon bi bi-chat mr-2"></i>
+                Comentar
+            </button>
+            <button type="button" class="post-action-button view-button">
+                <i class="fal fa-external-link-alt mr-2"></i>
+                Visualizar
+            </button>
+        </div>
+
+    </div>
+
+
+    <style>
+        component {
+            position: relative;
+            display: block;
+            width: 100%;
+            height: auto;
+            min-height: 500px;
+            background-color: white;
+            border: 1px solid #e0dfdc;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        component .post-area {
+            position: relative;
+            display: flex;
+            width: 100%;
+            min-height: 30px;
+            height: auto;
+        }
+
+        component .post-header {
+            min-width: 70px;
+            background-color: yellow;
+            padding: 10px 10px;
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+        }
+
+        component .post-content {
+            background-color: red;
+        }
+
+        component .post-footer {
+            height: auto;
+            background-color: blue;
+            flex-direction: column;
+        }
+
+        component .post-footer hr {
+            left: 0;
+            right: 0;
+            margin: .5rem auto;
+            width: 90%;
+            background-color: yellow;
+            color: yellow;
+        }
+
+
+        /*  DIV - Estátisticas da Publicação */
+        component .post-statistics {
+            display: flex;
+            width: 100%;
+            justify-content: flex-end;
+            align-items: center;
+            align-content: center;
+            flex-wrap: nowrap;
+        }
+
+
+        /* DIV - Botões de Ação da Publicação ( Curtir / Comentário ) */
+        component .post-actions-buttons {
+            position: relative;
+            bottom: 0;
+            display: flex;
+            width: 100%;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            align-items: center;
+            align-content: center;
+        }
+
+        /*  BOTÃO - Botão de Ação de Publicação */
+        component .btn-post-action {
+            background-color: transparent;
+            border: 1px solid #e0dfdc;
+            border-radius: 10px;
+            color: #e0dfdc;
+            font-weight: 600;
+            width: 100%;
+            margin: 5px;
+        }
+
+
+        component .feed-post-creator-container {
+            display: flex;
+            padding: 10px 10px;
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+            /* background-color: coral; */
+        }
+
+        /* Imagem do Criador */
+
+        component .feed-post-creator-container .feed-post-creator-image {
+            display: flex;
+            margin: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        component .feed-post-creator-container .feed-post-creator-image .creator-image {
+            position: relative;
+            width: 52px;
+            height: 52px;
+            border-radius: 100%;
+        }
+
+
+        /* Informações do Criador */
+        component .feed-post-creator-container .feed-post-creator-meta {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+
+        /* Nome do Criador */
+        component .feed-post-creator-container .feed-post-creator-meta .creator-name {
+            color: black;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 14px;
+        }
+
+        component .feed-post-creator-container .feed-post-creator-meta .creator-name:hover {
+            color: #007bff;
+            text-decoration: underline;
+        }
+
+        /* Setor do Criador */
+        component .feed-post-creator-container .feed-post-creator-meta .creator-sector {
+            color: rgba(0, 0, 0, .6);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+
+        /* Cargo do Criador */
+        component .feed-post-creator-container .feed-post-creator-meta .creator-job {
+            color: rgba(0, 0, 0, .6);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        /* Data da Publicação */
+        component .feed-post-creator-container .feed-post-creator-meta .post-date {
+            color: rgba(0, 0, 0, .6);
+            font-size: 10.8px;
+            font-weight: 400;
+        }
+
+
+        /* -------------------------------------------------- */
+
+
+        component .feed-post-creator-container .feed-post-options {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            flex: 1 1 auto;
+            width: 1%;
+        }
+
+        /* -------------------------------------------------- */
+
+        component .feed-post-description-container {
+            position: relative;
+            display: flex;
+            padding: 0px 25px 30px;
+            user-select: auto;
+            flex-direction: column;
+            align-items: flex-start;
+            align-content: center;
+            justify-content: center;
+        }
+
+        /* Título da Publicação */
+        component .feed-post-description-container .post-title {
+            color: black;
+            font-size: 16px;
+            font-weight: 600;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* Sub-Título da Publicação */
+        component .feed-post-description-container .post-subtitle {
+            color: rgb(100, 100, 100);
+            font-size: 14px;
+            font-weight: 500;
+            font-style: italic;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        component .feed-post-description-container .post-description {
+            height: 40px;
+            overflow: hidden;
+            padding-right: 70px;
+            text-align: left;
+        }
+
+        component .feed-post-description-container .post-body {
+            height: 40px;
+            overflow: hidden;
+            padding-right: 70px;
+            text-align: left;
+        }
+
+        component .feed-post-description-container .post-body * {
+            font-size: 15px;
+            color: black;
+        }
+
+        component .feed-post-description-container.show-more .post-description {
+            height: auto !important;
+            padding-right: 0;
+        }
+
+        component .feed-post-description-container.show-more .post-body {
+            height: auto !important;
+            padding-right: 0;
+        }
+
+        component .feed-post-description-container .show-more-description-button {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            color: #007bff;
+        }
+
+        component .feed-post-description-container .show-more-description-button:hover {
+            text-decoration: underline;
+        }
+
+        component .feed-post-description-container.show-more .show-more-description-button {
+            display: none;
+        }
+
+        /* ---------------------------------------------------------------------- */
+
+        /* Container de Fotos */
+        component .feed-post-images-container {
+            display: grid;
+            gap: 10px;
+            padding: 0px 25px 15px;
+        }
+
+        @media screen and (max-width: 576px) {
+            component .feed-post-images-container {
+                display: flex !important;
+                justify-content: flex-start;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+        }
+
+
+        /* Container de Fotos (1 Foto) ----------------------------------------------------------- */
+        component .feed-post-images-container.one-image {
+            grid-template-columns: 100%;
+        }
+
+        component .feed-post-images-container.one-image .image-preview-square {
+            height: auto;
+            border-radius: 10px;
+        }
+
+        @media screen and (max-width: 576px) {
+            component .feed-post-images-container.one-image .image-preview-square {
+                width: calc(var(--window-size-width) - 50px);
+                /* height: calc(var(--window-size-width) - 50px); */
+            }
+        }
+
+        /* Container de Fotos (2 Fotos) ---------------------------------------------------------- */
+        component .feed-post-images-container.two-images {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        component .feed-post-images-container.two-images .image-preview-square {
+            height: 350px;
+        }
+
+        @media screen and (max-width: 576px) {
+            component .feed-post-images-container.two-images .image-preview-square {
+                width: calc(var(--window-size-width) / 2 - 35px);
+                height: calc(var(--window-size-width) / 2 - 35px);
+            }
+        }
+
+
+        /* Container de Fotos (3 Fotos) ---------------------------------------------------------- */
+        component .feed-post-images-container.three-images {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        component .feed-post-images-container.three-images .image-preview-square {
+            height: 228px;
+        }
+
+        @media screen and (max-width: 576px) {
+            component .feed-post-images-container.three-images .image-preview-square {
+                width: calc(var(--window-size-width) / 3 - 26px);
+                height: calc(var(--window-size-width) / 3 - 26px);
+            }
+        }
+
+
+        /* Container de Fotos (4 Fotos) ---------------------------------------------------------- */
+        component .feed-post-images-container.four-images {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
+
+        component .feed-post-images-container.four-images .image-preview-square {
+            height: 168px;
+        }
+
+        @media screen and (max-width: 576px) {
+            component .feed-post-images-container.four-images .image-preview-square {
+                width: calc(var(--window-size-width) / 3 - 26px);
+                height: calc(var(--window-size-width) / 3 - 26px);
+            }
+        }
+
+        /* Container de Fotos (5 Fotos ou mais) -------------------------------------------------- */
+        component .feed-post-images-container.fivemore-images {
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        }
+
+
+        component .feed-post-images-container.fivemore-images .image-preview-square {
+            height: 132px;
+        }
+
+        @media screen and (max-width: 576px) {
+            component .feed-post-images-container.fivemore-images .image-preview-square {
+                width: calc(var(--window-size-width) / 3 - 26px);
+                height: calc(var(--window-size-width) / 3 - 26px);
+            }
+        }
+
+
+
+
+        /* ---------------------------------------------------------------------- */
+
+        component .feed-post-social-counts {
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e0dfdc;
+        }
+
+        /* ---------------------------------------------------------------------- */
+
+        component .feed-post-actions-container {
+            display: grid;
+            grid-auto-flow: column;
+            justify-content: initial;
+            column-gap: 0.4rem;
+            padding: .4rem 1.2rem;
+            min-height: 50px;
+            border-top: 1px solid #e0dfdc;
+            margin-left: 15px;
+            margin-right: 15px;
+        }
+
+        component .feed-post-actions-container .post-action-button {
+            background-color: transparent;
+            border: none;
+            border-radius: 5px;
+            transition-duration: .4s;
+            color: gray;
+        }
+
+        component .feed-post-actions-container .post-action-button:hover {
+            background-color: whitesmoke;
+        }
+
+        component .feed-post-actions-container .like-button.is-liked {
+            color: #007bff;
+            font-weight: 800;
+        }
+
+        component .feed-post-actions-container .like-button.is-liked i {
+            font-weight: 800;
+        }
+
+        @media screen and (max-width: 768px) {
+            component {
+                border-radius: 0;
+            }
+        }
+    </style>
+
+</component>
