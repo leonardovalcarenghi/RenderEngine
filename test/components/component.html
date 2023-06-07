@@ -1,55 +1,75 @@
-<component name="hello-world">
+<component name="component">
+  <script>
 
-    <script>
+    var pessoa;
+    var texto = "";
+    var loading = false;
 
-        $SCOPE.componentDidMount = function () {
-     
-            $VIEW.querySelector('[name="testButton"]').addEventListener("click", function () {
-                $VIEW.remove();
-            })
+    console.log("props", props);
 
+    function componentDidMount() {
+      console.log("componente montado!", props);
+    }
 
-        }
+    function componentDidUpdate() {
+      console.log("componente atualizado");
+    }
 
-        $SCOPE.componentWillUnmount = function () {
+    function refreshComponent() {
+      loading = true;
+      pessoa = texto;
+      Render();
+    }
 
-            console.log("componentWillUnmount, ELEMENTO FOI REMOVIDO");
+    function teste(e) {
+      alert(texto);
+    }
 
-        }
+    function alterarTexto(e) {
+      console.log("alterar");
+      texto = e.target.value;
+    }
 
+    var images = [
+      {
+        url: "https://via.placeholder.com/150",
+      },
+    ];
 
+    const list = [
+      { nome: "Leonardo" },
+      { nome: "Leonardo" },
+      { nome: "Lucas" },
+      { nome: "Fernando" },
+    ];
 
+    function ItemDaLista() {
+      return `<li></li>`;
+    }
+  </script>
 
-        const list = [
-            { nome: 'Leonardo' },
-            { nome: 'Leonardo' },
-            { nome: 'Lucas' },
-            { nome: 'Fernando' }
-        ]
-
-
-
-    </script>
-
-    <view style="margin: 10px;">
-        <label>Bem-vindo(a)
-            {{
-            $IF(typeof(pessoa) === "string", $SCOPE["pessoa"], "nada")
-            }}
-        </label>
-
-        <button name="testButton">Remover</button>
-
-        <ul>
-            {{
-            $MAP(list, _=>{
-
-            return `<li>${_.nome}</li>`
-
-            })
-            }}
-        </ul>
-
-    </view>
-
+  <view class="col-3 mb-3">
+    <div class="card">
+      {{ $MAP(images, _=> `<img title="" class="card-img-top" src="${_.url }" />`) }}
+      <div class="card-body">
+        <h5 class="card-title">
+          {{ $IF( typeof(pessoa) === "string", pessoa, "")}}
+        </h5>
+        <p class="card-text">
+          Some quick example text to build on the card title and make up the
+          bulk of the card's content.
+        </p>
+        <div class="mb-3">
+          <label for="exampleFormControlInput1" class="form-label">Texto:</label>
+          <input type="email" class="form-control" placeholder="teste" onchange="alterarTexto" value="{{texto}}" />
+        </div>
+        <button class="btn btn-primary" name="refreshButton" onclick="refreshComponent" disabled="{{loading}}">
+          Atualizar
+        </button>
+        <button class="btn btn-primary" name="testButton" onclick="teste">
+          Teste
+        </button>
+      </div>
+    </div>
+  </view>
 </component>

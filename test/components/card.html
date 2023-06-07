@@ -1,49 +1,60 @@
-<component name="component">
+<component name="card">
+  <script>
 
-    <view class="abc 123">
-    
-        <h1>{{name}}</h1>
-        <h2>{{lastName}}</h2>
-        <p>{{email || '<em>usuário sem e-mail...</em>'}}</p>
-        <button type="button" onclick="onClick">Aviso</button>      
+  </script>
 
-    </view>
+  <view class="abc 123">
+    {{$CONSOLE("teste")}}
 
-    <style>
-        component {
-            background-color: {{email ? 'lightblue': 'darkred'}};
-            color: {{email ? 'black': 'white'}};
-            margin-bottom: 10px;
-            padding: 20px;
-            border-radius: 5px;
+    <h1>{{name}}</h1>
+    <h2>{{lastName}}</h2>
+    <p>{{email || '<em>usuário sem e-mail...</em>'}}</p>
+    <button type="button" onclick="onClick">Aviso</button>
+  </view>
+
+  <style>
+    component {
+      background-color: {
+         {
+          email?'lightblue': "darkred";
         }
-
-        component h1 {
-            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-            font-size: 20px;
-            margin: 0;
+      }
+      color: {
+         {
+          email?'black': "white";
         }
+      }
+      margin-bottom: 10px;
+      padding: 20px;
+      border-radius: 5px;
+    }
 
-        component h2 {
-            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-            font-size: 18px;
-            margin: 0;
-        }
+    component h1 {
+      font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+      font-size: 20px;
+      margin: 0;
+    }
 
+    component h2 {
+      font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+      font-size: 18px;
+      margin: 0;
+    }
 
-        component p {
-            margin: 0;
-        }
+    component p {
+      margin: 0;
+    }
 
-        component button {
-            margin-top: 5px;
-            display: block;
-        }
+    component button {
+      margin-top: 5px;
+      display: block;
+    }
 
-        component.warning {
-            background-color: red;
-            color: white;
-        }
-    </style>
-
+    component.warning {
+      background-color: red;
+      color: white;
+    }
+  </style>
 </component>
